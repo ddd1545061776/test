@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>jQuery自定义名称代替$符号</title>
+        <script src="js/jquery-3.3.1.min.js"></script>
+    </head>
+    <body>
+        <h3>jQuery自定义名称代替$符号</h3>
+        <hr>
+        <button>
+            测试jQuery别名
+        </button>
+        <script>
+            var jq = jQuery.noConflict();
+            jq(document).ready(function() {
+                jq("button").click(function() {
+                    alert("jQuery的别名生效了！");
+                });
+            });
+        </script>
+    </body>
+</html>
