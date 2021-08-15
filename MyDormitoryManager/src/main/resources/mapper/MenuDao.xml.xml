@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ddd.dao.MenuDao" >
+    <resultMap id="MenusResultMap" type="com.ddd.po.Menu">
+        <id column="id" property="id"></id>
+        <id column="menu_name" property="menuName"></id>
+        <id column="url" property="url"></id>
+        <id column="parent_id" property="parentId"></id>
+    </resultMap>
+    <resultMap id="findMenus" type="com.ddd.po.Menu" extends="MenusResultMap">
+        <collection property="children" ofType="com.ddd.po.Menu">
+            <id column="id2" property="id"></id>
+            <id column="menu_name2" property="menuName"></id>
+            <id column="url2" property="url"></id>
+            <id column="parent_id2" property="parentId"></id>
+        </collection>
+    </resultMap>
+    <select id="findMenusByUsername" parameterType="String" resultMap="findMenus">
+        select
+DISTINCT
+m1.*,
+m2.id as id2,
+m2.menu_name as menu_name2,
+m2.url as url2,
+m2.parent_id as parent_id2
+from
+d_admin as da,
+admin_role as ar,
+role_menu as rm,
+d_menu m1,
+d_menu m2
+where
+da.a_id=ar.a_id
+and
+ar.r_id=rm.r_id
+and
+rm.m_id=m1.id
+and
+m1.id=m2.parent_id
+and
+da.username=#{username}
+    </select>
+</mapper>

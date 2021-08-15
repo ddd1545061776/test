@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ddd.dao.AdminDao" >
+    <resultMap id="AdminsResult" type="com.ddd.po.Admin">
+        <id column="a_id" property="a_id"></id>
+        <id column="username" property="username"></id>
+        <id column="password" property="password"></id>
+        <id column="a_name" property="a_name"></id>
+        <id column="a_phone" property="a_phone"></id>
+        <id column="a_head_shot" property="a_head_shot"></id>
+    </resultMap>
+    <resultMap id="RoleAndAdminResults" type="com.ddd.po.Admin" extends="AdminsResult">
+        <collection property="roles" ofType="com.ddd.po.Role">
+            <id column="id" property="id"></id>
+            <id column="role_name" property="roleName"></id>
+            <id column="role_desc" property="roleDesc"></id>
+        </collection>
+
+    </resultMap>
+    <!--登陆查询-->
+    <select id="findAdminAndRoleByUsername" parameterType="String" resultMap="RoleAndAdminResults">
+        select
+           ad.*,
+           dr.*
+           from
+           d_admin as ad,
+           d_role as dr,
+           admin_role as ar
+           where
+           ad.a_id=ar.a_id
+           and
+           ar.r_id =dr.id
+           and
+           ad.username=#{username}
+    </select>
+    <select id="findAdminByUsername" parameterType="String" resultMap="AdminsResult">
+                select * from d_admin  where  username=#{username}
+    </select>
+    <!--分页查询-->
+    <select id="getAdminList" parameterType="Admin" resultType="Admin">
+        select  * from d_admin
+        <where>
+            <if test="username!=null and username!='' ">
+                and  username like  '%${username}%'
+            </if>
+            <if test="a_id!=null and a_id!=0">
+                and  a_id like  '%${a_id}%'
+            </if>
+        </where>
+        ORDER BY  a_id asc
+        limit #{currentPage},#{pageSize}
+    </select>
+    <!--查询数据总数-->
+    <select id="totalCount"  resultType="Integer">
+        select count(a_id) from d_admin
+        <where>
+            <if test="username!=null and username!='' ">
+                and  username like  '%${username}%'
+            </if>
+            <if test="a_id!=null and a_id!=0">
+                and  a_id like  '%${a_id}%'
+            </if>
+        </where>
+    </select>
+
+    <!--添加管理员信息-->
+    <insert id="addAdmin" parameterType="Admin" keyProperty="a_id" useGeneratedKeys="true">
+        insert into d_admin (username,password,a_name,a_phone)
+        values(#{username},#{password},#{a_name},#{a_phone})
+    </insert>
+
+    <!--通过id删除管理员信息-->
+    <delete id="deleteAdmin" parameterType="Integer" >
+        delete from d_admin where a_id=#{a_id}
+    </delete>
+
+    <select id="findAdminById"  parameterType="Integer" resultType="Admin" >
+        select * from d_admin where a_id=#{a_id}
+    </select>
+
+    <select id="getAll" resultType="Admin">
+        select * from d_admin;
+    </select>
+
+    <!--修改管理员信息-->
+    <update id="updateAdmin" parameterType="Admin">
+        update d_admin
+        <set>
+            <if test="username!=null and username !=''">
+                username=#{username},
+            </if>
+            <if test="password !=null and password !=''">
+                password=#{password},
+            </if>
+            <if test="a_name !=null and a_name !=''">
+                a_name=#{a_name},
+            </if>
+            <if test="a_phone !=null and a_phone !=0">
+                a_phone=#{a_phone},
+            </if>
+        </set>
+        where a_id = #{a_id}
+    </update>
+</mapper>
